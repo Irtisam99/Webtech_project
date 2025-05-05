@@ -105,3 +105,13 @@ document.getElementById("regForm").addEventListener("submit", function (e) {
         this.reset(); 
     }
 });
+document.getElementById('refreshGif').addEventListener('click', function() {
+    var gif = document.getElementById('refreshGif');
+    
+ 
+    gif.src = "icon.gif"; 
+    setTimeout(function() {
+        gif.src = "icon.jpg";}, 2000);  
+    
+   
+});
