@@ -18,6 +18,7 @@
     background-color: rgb(186, 217, 221);
     width: 20vw;
     height: 76vh;
+    height: 76vh;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -25,7 +26,6 @@
     padding: 20px;
    
     box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
-    border-radius: 10px;
     overflow-y: auto;
    
 }
@@ -45,6 +45,7 @@
 }
 #flex4 {
     background-color:green;
+    height: 55vh;
     height: 55vh;
     width: 20vw;
     position: relative; 
@@ -203,8 +204,7 @@ h3 {
     font-size: large;
 }
 thead th {
-    position: sticky;
-    top: 0;
+ 
     
     z-index: 1;
 }
