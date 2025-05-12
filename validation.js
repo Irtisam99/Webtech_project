@@ -1,5 +1,6 @@
-document.getElementById("regForm").addEventListener("submit", function (e) {
-    e.preventDefault(); 
+document.getElementById("regForm").addEventListener("submit",validateForm);
+function validateForm(e) {
+   
     let hasError = false;
 
     
@@ -98,13 +99,13 @@ document.getElementById("regForm").addEventListener("submit", function (e) {
 
     if (hasError) {
         
-        return;
+        return false;
     } else {
         
         document.getElementById("successPopup").style.display = "block";
-        this.reset(); 
+        return true;
     }
-});
+}
 document.getElementById('refreshGif').addEventListener('click', function() {
     var gif = document.getElementById('refreshGif');
     
