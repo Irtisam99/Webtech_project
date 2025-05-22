@@ -1,34 +1,29 @@
+
+
 <?php
-session_start();
 
-// Connect to database (change username, password, database name if needed)
+$favColor = 'white';
+if (!empty($_COOKIE['fav_color'])) {
+    // sanitize to prevent CSS injection
+    $favColor = htmlspecialchars($_COOKIE['fav_color'], ENT_QUOTES);
+}
 $connection = new mysqli("localhost", "root", "", "aqi");
-
-// Check connection
 if ($connection->connect_error) {
     die("Database connection failed: " . $connection->connect_error);
 }
+$selectedCities = $_POST['cities'] ?? [];
 
-// Get the 10 selected cities from the session
-$selectedCities = [];
-for ($i = 1; $i <= 10; $i++) {
-    if (isset($_SESSION['city' . $i])) {
-        $selectedCities[] = $_SESSION['city' . $i];
-    }
+if (empty($selectedCities) || count($selectedCities) !== 10) {
+    die("No cities selected or invalid selection. Please select exactly 10 cities first.");
 }
 
-if (empty($selectedCities)) {
-    die("No cities selected. Please select 10 cities first.");
-}
 
-// Make a list of cities for the query, adding quotes around each city
-$cityList = "'" . implode("','", $selectedCities) . "'";
+$escapedCities = array_map([$connection, 'real_escape_string'], $selectedCities);
+$cityList = "'" . implode("','", $escapedCities) . "'";
 
-// Get AQI values for these cities from the database
 $query = "SELECT City, AQI FROM info WHERE City IN ($cityList)";
 $result = $connection->query($query);
 
-// Save the AQI values in an array
 $aqiValues = [];
 if ($result) {
     while ($row = $result->fetch_assoc()) {
@@ -36,7 +31,6 @@ if ($result) {
     }
 }
 
-// Close the database connection
 $connection->close();
 ?>
 
@@ -45,7 +39,13 @@ $connection->close();
 <head>
     <title>AQI for Selected Cities</title>
     <style>
-        body { font-family: Arial; text-align: center; margin-top: 50px; }
+    
+        body {
+            background-color: <?= $favColor ?>;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
         table { margin: 0 auto; border-collapse: collapse; width: 60%; }
         th, td { border: 1px solid black; padding: 10px; }
         th { background-color: #555; color: white; }

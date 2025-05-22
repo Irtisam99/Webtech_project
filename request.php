@@ -1,7 +1,4 @@
 <?php
-session_start();
-
-
 $cities = [
   "New York","Los Angeles","London","Paris","Berlin",
   "Beijing","Delhi","Tokyo","Moscow","Cairo",
@@ -10,42 +7,47 @@ $cities = [
 ];
 
 $error = '';
-
+$selected = [];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $sel = $_POST['cities'] ?? [];
-    
-    if (count($sel) !== 10) {
-        $error = "Please select exactly 10 cities (you selected " . count($sel) . ").";
+    $selected = $_POST['cities'] ?? [];
+
+    if (count($selected) !== 10) {
+        $error = "Please select exactly 10 cities. You selected " . count($selected) . ".";
     } else {
-      
-        for ($i = 0; $i < 10; $i++) {
-            $_SESSION['city' . ($i+1)] = $sel[$i];
+        // Valid selection — redirect via POST using hidden form
+        echo '<form id="forwardForm" action="showAQI.php" method="post">';
+        foreach ($selected as $city) {
+            echo '<input type="hidden" name="cities[]" value="' . htmlspecialchars($city) . '">';
         }
-        header('Location: showAQI.php');
+        echo '</form>';
+        echo '<script>document.getElementById("forwardForm").submit();</script>';
         exit;
     }
 }
 ?>
+
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>Select 10 Cities</title>
+  <title>Select Cities</title>
 </head>
 <body>
-  <h1>Select Exactly 10 Cities</h1>
+  <h2>Select Exactly 10 Cities</h2>
+
   <?php if ($error): ?>
-    <p style="color:red;"><?= htmlspecialchars($error) ?></p>
+    <p style="color: red;"><?= htmlspecialchars($error) ?></p>
   <?php endif; ?>
 
-  <form method="post">
+  <form method="post" action="request.php">
     <?php foreach ($cities as $city): ?>
       <label>
-        <input type="checkbox" name="cities[]" value="<?= htmlspecialchars($city) ?>">
+        <input type="checkbox" name="cities[]" value="<?= htmlspecialchars($city) ?>"
+          <?= in_array($city, $selected) ? 'checked' : '' ?>>
         <?= htmlspecialchars($city) ?>
       </label><br>
     <?php endforeach; ?>
+    <br>
     <button type="submit">Submit</button>
   </form>
 </body>
