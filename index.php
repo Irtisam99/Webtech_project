@@ -1,3 +1,53 @@
+<?php
+session_start();
+
+if (isset($_SESSION["email"])) {
+    header("Location: request.php");
+    exit();
+}
+
+if (isset($_POST["login"])) {
+    $email = $_POST["email"];
+    $pass = $_POST["password"];
+
+    $conn = mysqli_connect('localhost', 'root', '', 'aqi'); // update db name
+    if (!$conn) {
+        die("Connection failed: " . mysqli_connect_error());
+    }
+
+    // Get user by email only
+    $sql = "SELECT * FROM user WHERE email = '$email'";
+    $result = mysqli_query($conn, $sql);
+
+    if ($result && mysqli_num_rows($result) == 1) {
+        $row = mysqli_fetch_array($result, MYSQLI_ASSOC);
+
+        // Verify hashed password
+        if (password_verify($pass, $row['pass'])) {
+            $_SESSION["email"] = $email;
+            echo "You are now redirected...";
+            header("refresh: 2; url = request.php");
+            exit();
+        } else {
+            echo "Incorrect password. Redirecting back...";
+            header("refresh: 2; url = index.php");
+            exit();
+        }
+    } else {
+        echo "User not found. Redirecting back...";
+        header("refresh: 2; url = index.php");
+        exit();
+    }
+}
+
+if ($_SERVER["REQUEST_METHOD"] == "POST" && !isset($_POST["login"])) {
+    echo "Please fill in email and password.";
+    header("refresh: 2; url = index.php");
+}
+?>
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -83,14 +133,14 @@
         <div class="right-side">
             <div id="flex3" class="flex">
                 <h3 style="color: aqua;">LOGIN</h3>
-                <form id="loginform">
+                <form id="loginform" method="post" action="">
                     <label for="email">Email</label>
        <input type="email" id="email" name="email" required>
 
       <label for="password">Password</label>
       <input type="password" id="password" name="password" required>
 
-      <button type="submit">Login</button>
+      <button type="submit" name="login" >Login</button>
     </form>
     </div>
             <div id="flex4" class="flex">

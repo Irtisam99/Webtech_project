@@ -24,7 +24,10 @@ if (isset($_POST['confirm'])) {
     }
 
     $rawPassword = $_SESSION['password'] ?? '';
-    $maskedPassword = str_repeat('*', strlen($rawPassword)); // Store as dots or stars
+if (empty($rawPassword)) {
+    die("Password session missing. Cannot hash.");
+}
+$hashedPassword = password_hash($rawPassword, PASSWORD_DEFAULT);
 
     $name = mysqli_real_escape_string($conn, $_SESSION['name'] ?? '');
     $email = mysqli_real_escape_string($conn, $_SESSION['email'] ?? '');
@@ -32,7 +35,7 @@ if (isset($_POST['confirm'])) {
     $gender = mysqli_real_escape_string($conn, $_SESSION['gender'] ?? '');
     $country = mysqli_real_escape_string($conn, $_SESSION['country'] ?? '');
 
-    $sql = "INSERT INTO user(name, email, pass, dob, country, gender) VALUES ('$name', '$email', '$maskedPassword', '$dob', '$country', '$gender')";
+    $sql = "INSERT INTO user(name, email, pass, dob, country, gender) VALUES ('$name', '$email', '$hashedPassword', '$dob', '$country', '$gender')";
     mysqli_query($conn, $sql);
 
     mysqli_close($conn);

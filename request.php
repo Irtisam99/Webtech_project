@@ -1,4 +1,9 @@
 <?php
+session_start();
+if (!isset($_SESSION["email"])) {
+    header("Location: index.php");
+    exit();
+}
 $cities = [
   "New York","Los Angeles","London","Paris","Berlin",
   "Beijing","Delhi","Tokyo","Moscow","Cairo",
@@ -50,5 +55,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <br>
     <button type="submit">Submit</button>
   </form>
+  <form action="logout.php" method="post">
+    <button type="submit">Logout</button>
+</form>
 </body>
 </html>
