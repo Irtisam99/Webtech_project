@@ -19,8 +19,12 @@ if (isset($_POST['cancel'])) {
 }
 
 if (isset($_POST['confirm'])) {
-    if (!empty($_SESSION['color'])) {
-        setcookie("color", $_SESSION['color'], time() + (86400 * 30), "/");
+    if (!empty($_SESSION['color']) && !empty($_SESSION['email'])) {
+       
+        $e = urlencode($_SESSION['email']);
+      
+        $cookieKey = "color_" . str_replace('.', '_', $e);
+        setcookie($cookieKey, $_SESSION['color'], time() + (86400 * 30), "/");
     }
 
     $rawPassword = $_SESSION['password'] ?? '';
@@ -56,6 +60,21 @@ if (isset($_POST['submit'])) {
     $_SESSION['color'] = $_POST['color'] ?? '';
     $_SESSION['country'] = $_POST['country'] ?? '';
     $_SESSION['opinion'] = $_POST['opinion'] ?? '';
+
+    $checkEmail = mysqli_real_escape_string($conn, $_SESSION['email']);
+$checkQuery = "SELECT * FROM user WHERE email = '$checkEmail'";
+$checkResult = mysqli_query($conn, $checkQuery);
+
+if (mysqli_num_rows($checkResult) > 0) {
+    session_unset();
+    session_destroy();
+    header("Location: index.php?error=emailexists");
+    exit();
+}
+
+
+
+
 
     echo '<!DOCTYPE html>
 <html>

@@ -25,6 +25,7 @@ if (isset($_POST["login"])) {
         // Verify hashed password
         if (password_verify($pass, $row['pass'])) {
             $_SESSION["email"] = $email;
+
             echo "You are now redirected...";
             header("refresh: 2; url = request.php");
             exit();
@@ -75,7 +76,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && !isset($_POST["login"])) {
 
                 <label for="email">Email</label>
                 <input type="email" id="email" name="email" required>
-                <span class="error-message" id="emailError"></span>
+                <span class="error-message" id="emailError">
+                  <?php
+    if (isset($_GET['error']) && $_GET['error'] === 'emailexists') {
+        echo "Email already registered. Please use a different email.";
+    }
+?>
+                </span>
 
                 <label for="password">Password</label>
                 <input type="password" id="password" name="password" required>
