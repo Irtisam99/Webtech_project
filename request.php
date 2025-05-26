@@ -1,19 +1,20 @@
 <?php
 session_start();
+header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+header("Cache-Control: post-check=0, pre-check=0", false);
+header("Pragma: no-cache");
 if (!isset($_SESSION["email"])) {
     header("Location: index.php");
     exit();
 }
 
-$email = $_SESSION["email"];  // get the logged-in email
+$email = $_SESSION["email"];
 
-// Connect to database (update credentials)
 $conn = mysqli_connect("localhost", "root", "", "aqi");
 if (!$conn) {
     die("Connection failed.");
 }
 
-// Fetch countries
 $cities = [];
 $sql = "SELECT city FROM info LIMIT 20";
 $result = mysqli_query($conn, $sql);
@@ -33,7 +34,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if ($count < 1 || $count > 10) {
         $error = "Please select between 1 and 10 countries. You selected $count.";
     } else {
-        // Send to showAQI.php with POST
         $_SESSION['selected_cities'] = $selected;
         header("Location: showAQI.php");
         exit();
@@ -165,6 +165,15 @@ mysqli_close($conn);
         <button type="submit" style="margin-top: 10px; background: #dc3545;">Logout</button>
     </form>
 </div>
+
+
+<script>
+    window.addEventListener("pageshow", function (event) {
+        if (event.persisted || (performance && performance.navigation.type === 2)) {
+            window.location.reload();
+        }
+    });
+</script>
 
 </body>
 </html>

@@ -1,5 +1,8 @@
 <?php
 session_start();
+header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
+header("Cache-Control: post-check=0, pre-check=0", false);
+header("Pragma: no-cache");
 
 if (!isset($_SESSION["email"])) {
     header("Location: index.php");
@@ -10,13 +13,11 @@ $email = $_SESSION["email"];
 $e            = urlencode($email);
 $cookieName   = "color_" . str_replace('.', '_', $e);
 
-
 $bgColor = '#ffffff';
 
 if (isset($_COOKIE[$cookieName])) {
     $raw = $_COOKIE[$cookieName];  
 
-   
     if (strpos($raw, '%23') === 0) {
         $decoded = urldecode($raw);      
     } else {
@@ -27,14 +28,12 @@ if (isset($_COOKIE[$cookieName])) {
     }
 }
 
-
 if (!isset($_SESSION['selected_cities']) || empty($_SESSION['selected_cities'])) {
     echo "No cities selected. Please go back and select cities.";
     exit();
 }
 
 $selectedCities = $_SESSION['selected_cities'];
-
 
 $conn = mysqli_connect("localhost", "root", "", "aqi");
 if (!$conn) {
@@ -63,92 +62,10 @@ mysqli_close($conn);
 <html>
 <head>
     <title>Selected Cities AQI</title>
+    <link rel="stylesheet" href="aqi.css">
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: <?= $bgColor ?>;
-            padding: 30px;
-        }
-
-        .username {
-            text-align: right;
-            font-weight: 600;
-            color: #007bff;
-            margin-bottom: 15px;
-            font-size: 14px;
-            max-width: 80%;
-            margin-left: auto;
-        }
-
-        h2 {
-            text-align: center;
-            margin-bottom: 25px;
-            color: #333;
-        }
-
-        table {
-            width: 80%;
-            margin: 0 auto;
-            border-collapse: collapse;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-            background: white;
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        th, td {
-            padding: 15px 20px;
-            text-align: center;
-            border-bottom: 1px solid #ddd;
-        }
-
-        th {
-            background-color: #007bff;
-            color: white;
-        }
-
-        tr:hover {
-            background-color: #f1f9ff;
-        }
-
-        .no-data {
-            text-align: center;
-            margin-top: 20px;
-            color: #555;
-            font-size: 18px;
-        }
-
-        .back-form {
-            text-align: center;
-            margin-top: 30px;
-        }
-
-        .back-button, .logout-button {
-            padding: 12px 24px;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 16px;
-            cursor: pointer;
-        }
-
-        .back-button {
-            background: #007bff;
-            color: white;
-        }
-
-        .back-button:hover {
-            background: #0056b3;
-        }
-
-        .logout-button {
-            background: #dc3545;
-            color: white;
-            margin-top: 10px;
-        }
-
-        .logout-button:hover {
-            background: #a71d2a;
+        :root {
+            --bg-color: <?= $bgColor ?>;
         }
     </style>
 </head>
@@ -190,6 +107,14 @@ mysqli_close($conn);
 <form action="logout.php" method="post" class="back-form">
     <button type="submit" class="logout-button">Logout</button>
 </form>
+
+<script>
+    window.addEventListener("pageshow", function (event) {
+        if (event.persisted || (performance && performance.navigation.type === 2)) {
+            window.location.reload();
+        }
+    });
+</script>
 
 </body>
 </html>
