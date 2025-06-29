@@ -1,10 +1,56 @@
+<?php
+session_start();
+
+if (isset($_SESSION["email"])) {
+    header("Location: request.php");
+    exit();
+}
+
+if (isset($_POST["login"])) {
+    $email = $_POST["email"];
+    $pass = $_POST["password"];
+
+    $conn = mysqli_connect('localhost', 'root', '', 'aqi');
+    if (!$conn) {
+        die("Connection failed: " . mysqli_connect_error());
+    }
+
+    $sql = "SELECT * FROM user WHERE email = '$email'";
+    $result = mysqli_query($conn, $sql);
+
+    if ($result && mysqli_num_rows($result) == 1) {
+        $row = mysqli_fetch_array($result, MYSQLI_ASSOC);
+
+        if (password_verify($pass, $row['pass'])) {
+            $_SESSION["email"] = $email;
+            echo "You are now redirected...";
+            header("refresh: 2; url = request.php");
+            exit();
+        } else {
+            echo "Incorrect password. Redirecting back...";
+            header("refresh: 2; url = index.php");
+            exit();
+        }
+    } else {
+        echo "User not found. Redirecting back...";
+        header("refresh: 2; url = index.php");
+        exit();
+    }
+}
+
+if ($_SERVER["REQUEST_METHOD"] == "POST" && !isset($_POST["login"])) {
+    echo "Please fill in email and password.";
+    header("refresh: 2; url = index.php");
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Air Quality Index</title>
-    <link rel="stylesheet" type="text/css" href="style.css">    
+    <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 <body>
     <div style="text-align: center;">
@@ -17,30 +63,35 @@
     <div class="flex-container">
         <div id="flex1">
             <h2>Registration Form</h2><br>
-            <form id="regForm">
+            <form id="regForm" method="post" action="process.php" onsubmit="return validateForm()">
                 <label for="name">Name</label>
-                <input type="text" id="name" name="name" required>
+                <input type="text" id="name" name="name">
                 <span class="error-message" id="nameError"></span>
 
-
                 <label for="email">Email</label>
-                <input type="email" id="email" name="email" required>
-                <span class="error-message" id="emailError"></span>
+                <input type="email" id="email" name="email">
+                <span class="error-message" id="emailError">
+                  <?php
+                    if (isset($_GET['error']) && $_GET['error'] === 'emailexists') {
+                        echo "Email already registered. Please use a different email.";
+                    }
+                  ?>
+                </span>
 
                 <label for="password">Password</label>
-                <input type="password" id="password" name="password" required>
+                <input type="password" id="password" name="password">
                 <span class="error-message" id="passwordError"></span>
 
                 <label for="confirm_password">Confirm Password</label>
-                <input type="password" id="confirm_password" name="confirm_password" required>
+                <input type="password" id="confirm_password" name="confirm_password">
                 <span class="error-message" id="confirmPasswordError"></span>
 
                 <label for="dob">Date of Birth</label>
-                <input type="date" id="dob" name="dob" required>
+                <input type="date" id="dob" name="dob">
                 <span class="error-message" id="dobError"></span>
 
                 <label for="country">Country</label>
-                <select id="country" name="country" required>
+                <select id="country" name="country">
                     <option value="">Select your country</option>
                     <option value="USA">United States</option>
                     <option value="UK">United Kingdom</option>
@@ -54,53 +105,58 @@
 
                 <label>Gender</label>
                 <div class="radio-group">
-                    <input type="radio" id="male" name="gender" value="Male" required>
+                    <input type="radio" id="male" name="gender" value="Male">
                     <label for="male">Male</label>
 
-                    <input type="radio" id="female" name="gender" value="Female" required>
+                    <input type="radio" id="female" name="gender" value="Female">
                     <label for="female">Female</label>
-
-                
                 </div>
                 <span class="error-message" id="genderError"></span>
 
                 <label for="color">Favorite Color</label>
-                <input type="color" id="color" name="color" required>
-                
+                <input type="color" id="color" name="color">
+                <span class="error-message" id="colorError"></span>
 
                 <label for="opinion">Your Opinion</label>
-                <textarea id="opinion" name="opinion" placeholder="Share your thoughts..." required></textarea>
+                <textarea id="opinion" name="opinion" placeholder="Share your thoughts..."></textarea>
                 <span class="error-message" id="opinionError"></span>
 
                 <div id="terms" class="terms-container">
-                    <input type="checkbox" id="agreeCheckbox" required>
-                    <label for="agreeCheckbox">I agree to the <a href="#top">Terms and Conditions</a></label>   
-                </div>
+                    <input type="checkbox" id="agreeCheckbox" name="agreeCheckbox">
+                    <label for="agreeCheckbox">I agree to the <a href="#top">Terms and Conditions</a></label>
+                   </div>
+                    <span class="error-message" id="termsError"></span>
+               
 
-                <button type="submit">Register</button>
+                <button type="submit" name="submit">Register</button>
             </form>
         </div>
         <div class="right-side">
             <div id="flex3" class="flex">
                 <h3 style="color: aqua;">LOGIN</h3>
-                <form id="loginform">
+                <form id="loginform" method="post" action="">
                     <label for="email">Email</label>
-       <input type="email" id="email" name="email" required>
+                    <input type="email" id="email" name="email" required>
 
-      <label for="password">Password</label>
-      <input type="password" id="password" name="password" required>
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required>
 
-      <button type="submit">Login</button>
-    </form>
-    </div>
+                    <button type="submit" name="login">Login</button>
+                </form>
+            </div>
             <div id="flex4" class="flex">
+                <div id="loginOverlay">
+                    <div id="overlayContent">
+                        <h2>Login Required</h2>
+                    </div>
+                </div>
                 <div id="innerBox">
                     <div class="refresh-container" id="refreshContainer">
                         <img src="icon.jpg" alt="Refresh" id="refreshGif">
                         <span id="refreshLabel">Refresh</span>
-                      </div>
+                    </div>
                     <table>
-                      <thead>
+                        <thead>
                         <tr>
                           <th>City</th>
                           <th>AQI</th>
@@ -153,23 +209,10 @@
                         </tr>
                       </tbody>
                     </table>
-                  </div>
-
-
+                </div>
             </div>
         </div>
     </div>
-
-  
-<div id="successPopup" style="display:none; position: fixed; z-index: 5000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); text-align: center;">
-    <div style="background-color: white; padding: 20px; margin: 200px auto; width: 300px; border-radius: 10px;">
-        <h3>Registered Successfully!</h3>
-        <button onclick="document.getElementById('successPopup').style.display='none'">Close</button>
-    </div>
-</div>
-
-
-
 
     <script src="validation.js"></script>
 </body>

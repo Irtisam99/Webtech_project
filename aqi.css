@@ -1,0 +1,86 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-color);
+    padding: 30px;
+}
+
+.username {
+    text-align: right;
+    font-weight: 600;
+    color: #007bff;
+    margin-bottom: 15px;
+    font-size: 14px;
+    max-width: 80%;
+    margin-left: auto;
+}
+
+h2 {
+    text-align: center;
+    margin-bottom: 25px;
+    color: #333;
+}
+
+table {
+    width: 80%;
+    margin: 0 auto;
+    border-collapse: collapse;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+th, td {
+    padding: 15px 20px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    background-color: #007bff;
+    color: white;
+}
+
+tr:hover {
+    background-color: #f1f9ff;
+}
+
+.no-data {
+    text-align: center;
+    margin-top: 20px;
+    color: #555;
+    font-size: 18px;
+}
+
+.back-form {
+    text-align: center;
+    margin-top: 30px;
+}
+
+.back-button, .logout-button {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.back-button {
+    background: #007bff;
+    color: white;
+}
+
+.back-button:hover {
+    background: #0056b3;
+}
+
+.logout-button {
+    background: #dc3545;
+    color: white;
+    margin-top: 10px;
+}
+
+.logout-button:hover {
+    background: #a71d2a;
+}
